@@ -39,6 +39,7 @@ public class User implements UserDetails {
     private Boolean status = true;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @ManyToOne(fetch = FetchType.EAGER) // EAGER loads the department whenever the user is loaded
@@ -49,10 +50,12 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "students")
     private List<Session> enrolledSessions;
 
-    // --- UserDetails Methods ---
+    // ✅ KEY FIX — return authority WITHOUT "ROLE_" prefix
+    // This matches @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
+        // returns "ADMIN" → matches hasAuthority('ADMIN') ✅
     }
 
     @Override

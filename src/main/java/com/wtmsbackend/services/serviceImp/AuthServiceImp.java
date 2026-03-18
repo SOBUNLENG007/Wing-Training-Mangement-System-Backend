@@ -12,6 +12,7 @@ import com.wtmsbackend.models.role.Role;
 import com.wtmsbackend.repositories.DepartmentRepository;
 import com.wtmsbackend.repositories.OtpRepository;
 import com.wtmsbackend.repositories.UserRepository;
+import com.wtmsbackend.security.JwtDecodedResponse;
 import com.wtmsbackend.security.JwtService;
 import com.wtmsbackend.services.AuthService;
 import com.wtmsbackend.services.EmailService;
@@ -54,8 +55,9 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber())
                 .address(userRequest.getAddress())
-                .role(Role.USER)
-                .department(department)   // ✅ SET DEPARTMENT
+                .role(Role.EMPLOYEE)
+                .status(true)
+                .department(department)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -78,10 +80,17 @@ public class AuthServiceImp implements AuthService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
+        var decoded = JwtDecodedResponse.builder()
+                .header(jwtService.decodeHeader(jwtToken))
+                .payload(jwtService.decodePayload(jwtToken))
+                .signature(jwtService.extractSignature(jwtToken))
+                .build();
+
         return LoginResponse.builder()
                 .user(mapToUserResponse(user))
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .decodedToken(decoded)
                 .build();
     }
 
@@ -163,7 +172,7 @@ public class AuthServiceImp implements AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .PhoneNumber(user.getPhoneNumber()) // Note: Changed to lowercase 'p' to match standard naming conventions
+                .phoneNumber(user.getPhoneNumber()) // Note: Changed to lowercase 'p' to match standard naming conventions
                 .address(user.getAddress())
                 .status(user.getStatus())
                 .departmentId(user.getDepartment().getId())

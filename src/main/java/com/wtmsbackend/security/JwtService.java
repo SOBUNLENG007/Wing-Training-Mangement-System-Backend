@@ -1,5 +1,6 @@
 package com.wtmsbackend.security;
 
+import com.wtmsbackend.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,6 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 @Service
 public class JwtService {
 
@@ -29,8 +35,48 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    // security/JwtService.java
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        if (userDetails instanceof User user) {
+            extraClaims.put("user_id",  user.getId());
+            extraClaims.put("username", user.getFirstName() + " " + user.getLastName());
+            extraClaims.put("role",     user.getRole().name()); // ← "ADMIN"
+            extraClaims.put("email",    user.getEmail());
+        }
+
+        return generateToken(extraClaims, userDetails);
+    }
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public Map<String, Object> decodeHeader(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            String headerJson = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
+            return objectMapper.readValue(headerJson, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to decode JWT header", e);
+        }
+    }
+
+    public Map<String, Object> decodePayload(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            return objectMapper.readValue(payloadJson, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to decode JWT payload", e);
+        }
+    }
+
+    public String extractSignature(String token) {
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new RuntimeException("Invalid JWT format");
+        }
+        return parts[2];
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {

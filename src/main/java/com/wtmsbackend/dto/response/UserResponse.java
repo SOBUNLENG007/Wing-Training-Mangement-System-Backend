@@ -1,3 +1,4 @@
+// dto/response/UserResponse.java
 package com.wtmsbackend.dto.response;
 
 import lombok.AllArgsConstructor;
@@ -11,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserResponse {
     private Integer id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String PhoneNumber;
-    private String address;
+    private String  firstName;
+    private String  lastName;
+    private String  email;
+    private String  phoneNumber;
+    private String  address;
     private Boolean status;
     private Integer departmentId;
-    private String departmentName;
+    private String  departmentName;
+    private String  role;
 }

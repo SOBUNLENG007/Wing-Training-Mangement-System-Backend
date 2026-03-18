@@ -34,14 +34,14 @@ public class UserRequest {
 
     // --- Added WTMS Specific Fields ---
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Invalid phone number format")
+//    @NotBlank(message = "Phone number is required")
+//    @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Invalid phone number format")
     private String phoneNumber;
 
-    @NotBlank(message = "Address is required")
-    @Size(max = 255, message = "Address cannot exceed 255 characters")
+//    @NotBlank(message = "Address is required")
+//    @Size(max = 255, message = "Address cannot exceed 255 characters")
     private String address;
 
-    @NotNull(message = "Department ID is required")
+//    @NotNull(message = "Department ID is required")
     private Integer departmentId;
 }

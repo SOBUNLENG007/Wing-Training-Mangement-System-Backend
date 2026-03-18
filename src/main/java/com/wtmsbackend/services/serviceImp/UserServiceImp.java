@@ -66,7 +66,7 @@ public class UserServiceImp implements UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phoneNumber(request.getPhoneNumber())
                 .address(request.getAddress())
-                .role(Role.USER)
+                .role(Role.EMPLOYEE)
                 .status(true)
                 .build();
 
@@ -126,11 +126,14 @@ public class UserServiceImp implements UserService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
-                .departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null)
-//                .phoneNumber(user.getPhoneNumber())
+                .phoneNumber(user.getPhoneNumber())                              // ✅ uncommented
                 .address(user.getAddress())
                 .status(user.getStatus())
+                .departmentId(user.getDepartment() != null
+                        ? user.getDepartment().getId() : null)
+                .departmentName(user.getDepartment() != null
+                        ? user.getDepartment().getName() : null)
+                .role(user.getRole() != null ? user.getRole().name() : null)    // ✅ added role
                 .build();
     }
 }

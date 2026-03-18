@@ -1,16 +1,18 @@
 package com.wtmsbackend.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
+import com.wtmsbackend.security.JwtDecodedResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NotBlank
+@NoArgsConstructor
 @Builder
 public class LoginResponse {
     private UserResponse user;
     private String accessToken;
     private String refreshToken;
+    private JwtDecodedResponse decodedToken;
 }

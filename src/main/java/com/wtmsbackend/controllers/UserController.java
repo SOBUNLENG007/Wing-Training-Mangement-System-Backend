@@ -51,30 +51,34 @@ public class UserController {
     }
 
     // 2. Get current logged-in user
-    @Operation(
-            summary = "Get current authenticated user",
-            description = "Retrieves the details of the currently logged-in user based on the provided JWT Bearer token."
-    )
+
+    @Operation(summary = "Get current authenticated user")
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+
+        // ✅ Use mapToUserResponse style — include role and phoneNumber
         UserResponse userResponse = UserResponse.builder()
                 .id(currentUser.getId())
                 .firstName(currentUser.getFirstName())
                 .lastName(currentUser.getLastName())
                 .email(currentUser.getEmail())
-//                .phoneNumber(currentUser.getPhoneNumber())
+                .phoneNumber(currentUser.getPhoneNumber())
                 .address(currentUser.getAddress())
                 .status(currentUser.getStatus())
+                .role(currentUser.getRole() != null
+                        ? currentUser.getRole().name() : null)
+                .departmentId(currentUser.getDepartment() != null
+                        ? currentUser.getDepartment().getId() : null)
+                .departmentName(currentUser.getDepartment() != null
+                        ? currentUser.getDepartment().getName() : null)
                 .build();
 
-        ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
+        return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
                 .message("Current user fetched successfully")
                 .success(true)
                 .payload(userResponse)
                 .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+                .build());
     }
 
     // 3. Get user by ID
@@ -188,28 +192,6 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-
-//    @Operation(
-//            summary = "Get users by Department ID",
-//            description = "Retrieves a paginated list of users that belong to a specific department."
-//    )
-//    @GetMapping("/department/{departmentId}")
-//    public ResponseEntity<?> getUsersByDepartment(
-//            @PathVariable Integer departmentId,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size
-//    ) {
-//        Page<UserResponse> users = userService.getUsersByDepartment(departmentId, page, size);
-//
-//        ApiResponse<Page<UserResponse>> response = ApiResponse.<Page<UserResponse>>builder()
-//                .message("Users fetched successfully by department")
-//                .success(true)
-//                .payload(users)
-//                .timestamp(LocalDateTime.now())
-//                .build();
-//
-//        return ResponseEntity.ok(response);
-//    }
 
     @Operation(
             summary = "Get users by Department ID",
