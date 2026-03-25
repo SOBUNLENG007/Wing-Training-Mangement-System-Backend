@@ -8,7 +8,9 @@ import com.wtmsbackend.repositories.NotificationRepository;
 import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.services.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +22,27 @@ public class NotificationServiceImp implements NotificationService {
     private final UserRepository userRepository;
 
     @Override
-    public Page<NotificationResponse> getAllNotifications(int page, int size) {
-        return notificationRepository.findAll(PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<NotificationResponse> getAllNotifications(int page, int size) {
+        List<NotificationResponse> notifications = notificationRepository.findAll(PageRequest.of(page, size))
+                .map(this::mapToResponse)
+                .getContent();
+        return notifications;
     }
 
     @Override
-    public Page<NotificationResponse> getUserNotifications(Integer userId, int page, int size) {
-        return notificationRepository.findByUserId(userId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<NotificationResponse> getUserNotifications(Integer userId, int page, int size) {
+        List<NotificationResponse> notifications = notificationRepository.findByUserId(userId, PageRequest.of(page, size))
+                .map(this::mapToResponse)
+                .getContent();
+        return notifications;
     }
 
     @Override
-    public Page<NotificationResponse> getUnreadUserNotifications(Integer userId, int page, int size) {
-        return notificationRepository.findByUserIdAndIsReadFalse(userId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<NotificationResponse> getUnreadUserNotifications(Integer userId, int page, int size) {
+        List<NotificationResponse> notifications = notificationRepository.findByUserIdAndIsReadFalse(userId, PageRequest.of(page, size))
+                .map(this::mapToResponse)
+                .getContent();
+        return notifications;
     }
 
     @Override

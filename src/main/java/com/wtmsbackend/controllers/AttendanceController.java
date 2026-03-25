@@ -1,21 +1,30 @@
 package com.wtmsbackend.controllers;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.wtmsbackend.dto.ApiResponse;
 import com.wtmsbackend.dto.request.AttendanceRequest;
 import com.wtmsbackend.dto.response.AttendanceResponse;
-import com.wtmsbackend.dto.response.PagedResponse;
 import com.wtmsbackend.services.AttendanceService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/attendance")
@@ -29,16 +38,16 @@ public class AttendanceController {
     @Operation(summary = "Get all attendance records", description = "Retrieves a paginated list of all attendance records.")
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<ApiResponse<PagedResponse<AttendanceResponse>>> getAllAttendance(
+    public ResponseEntity<ApiResponse<List<AttendanceResponse>>> getAllAttendance(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<AttendanceResponse> attendancePage = attendanceService.getAllAttendance(page, size);
+        List<AttendanceResponse> attendancePage = attendanceService.getAllAttendance(page, size);
 
-        ApiResponse<PagedResponse<AttendanceResponse>> response = ApiResponse.<PagedResponse<AttendanceResponse>>builder()
+        ApiResponse<List<AttendanceResponse>> response = ApiResponse.<List<AttendanceResponse>>builder()
                 .message("Attendance fetched successfully!")
                 .success(true)
-                .payload(buildPagedResponse(attendancePage))
+                .payload(attendancePage)
                 .timestamp(LocalDateTime.now())
                 .build();
 
@@ -48,17 +57,17 @@ public class AttendanceController {
     @Operation(summary = "Get attendance by Session ID", description = "Retrieves the attendance sheet for a specific training session.")
     @GetMapping("/session/{sessionId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<ApiResponse<PagedResponse<AttendanceResponse>>> getAttendanceBySession(
+    public ResponseEntity<ApiResponse<List<AttendanceResponse>>> getAttendanceBySession(
             @PathVariable Integer sessionId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<AttendanceResponse> attendancePage = attendanceService.getAttendanceBySession(sessionId, page, size);
+        List<AttendanceResponse> attendancePage = attendanceService.getAttendanceBySession(sessionId, page, size);
 
-        ApiResponse<PagedResponse<AttendanceResponse>> response = ApiResponse.<PagedResponse<AttendanceResponse>>builder()
+        ApiResponse<List<AttendanceResponse>> response = ApiResponse.<List<AttendanceResponse>>builder()
                 .message("Session attendance fetched successfully!")
                 .success(true)
-                .payload(buildPagedResponse(attendancePage))
+                .payload(attendancePage)
                 .timestamp(LocalDateTime.now())
                 .build();
 
@@ -67,17 +76,17 @@ public class AttendanceController {
 
     @Operation(summary = "Get attendance by User ID", description = "Retrieves all attendance records for a specific employee.")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<PagedResponse<AttendanceResponse>>> getAttendanceByUser(
+    public ResponseEntity<ApiResponse<List<AttendanceResponse>>> getAttendanceByUser(
             @PathVariable Integer userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<AttendanceResponse> attendancePage = attendanceService.getAttendanceByUser(userId, page, size);
+        List<AttendanceResponse> attendancePage = attendanceService.getAttendanceByUser(userId, page, size);
 
-        ApiResponse<PagedResponse<AttendanceResponse>> response = ApiResponse.<PagedResponse<AttendanceResponse>>builder()
+        ApiResponse<List<AttendanceResponse>> response = ApiResponse.<List<AttendanceResponse>>builder()
                 .message("User attendance fetched successfully!")
                 .success(true)
-                .payload(buildPagedResponse(attendancePage))
+                .payload(attendancePage)
                 .timestamp(LocalDateTime.now())
                 .build();
 
@@ -149,15 +158,4 @@ public class AttendanceController {
         return ResponseEntity.ok(response);
     }
 
-    // Helper method to keep controller endpoints clean
-    private PagedResponse<AttendanceResponse> buildPagedResponse(Page<AttendanceResponse> page) {
-        return PagedResponse.<AttendanceResponse>builder()
-                .content(page.getContent())
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
-                .build();
-    }
 }

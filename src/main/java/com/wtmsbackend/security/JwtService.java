@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
 @Service
 public class JwtService {
 
@@ -40,10 +41,10 @@ public class JwtService {
         Map<String, Object> extraClaims = new HashMap<>();
 
         if (userDetails instanceof User user) {
-            extraClaims.put("user_id",  user.getId());
+            extraClaims.put("user_id", user.getId());
             extraClaims.put("username", user.getFirstName() + " " + user.getLastName());
-            extraClaims.put("role",     user.getRole().name()); // ← "ADMIN"
-            extraClaims.put("email",    user.getEmail());
+            extraClaims.put("role", user.getRole().name()); // ← "ADMIN"
+            extraClaims.put("email", user.getEmail());
         }
 
         return generateToken(extraClaims, userDetails);
@@ -55,7 +56,8 @@ public class JwtService {
         try {
             String[] parts = token.split("\\.");
             String headerJson = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
-            return objectMapper.readValue(headerJson, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(headerJson, new TypeReference<Map<String, Object>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException("Failed to decode JWT header", e);
         }
@@ -65,19 +67,14 @@ public class JwtService {
         try {
             String[] parts = token.split("\\.");
             String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-            return objectMapper.readValue(payloadJson, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(payloadJson, new TypeReference<Map<String, Object>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException("Failed to decode JWT payload", e);
         }
     }
 
-    public String extractSignature(String token) {
-        String[] parts = token.split("\\.");
-        if (parts.length != 3) {
-            throw new RuntimeException("Invalid JWT format");
-        }
-        return parts[2];
-    }
+
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, 1000 * 60 * 60 * 24); // 1 Day Expiration
@@ -87,10 +84,7 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, 1000 * 60 * 60 * 24 * 7); // 7 Days Expiration
     }
 
-    // --- NEW: 1 Hour Token specifically for Password Resets ---
-    public String generatePasswordResetToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, 1000 * 60 * 60); // 1 Hour Expiration
-    }
+
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()

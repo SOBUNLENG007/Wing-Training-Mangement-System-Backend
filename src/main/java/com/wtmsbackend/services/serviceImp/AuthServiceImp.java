@@ -1,6 +1,16 @@
 package com.wtmsbackend.services.serviceImp;
 
-import com.wtmsbackend.dto.request.ForgetPasswordRequest;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.wtmsbackend.dto.request.LoginRequest;
 import com.wtmsbackend.dto.request.UserRequest;
 import com.wtmsbackend.dto.response.LoginResponse;
@@ -8,23 +18,16 @@ import com.wtmsbackend.dto.response.UserResponse;
 import com.wtmsbackend.models.Department;
 import com.wtmsbackend.models.Otp;
 import com.wtmsbackend.models.User;
-import com.wtmsbackend.models.role.Role;
+import com.wtmsbackend.models.Until.Role;
 import com.wtmsbackend.repositories.DepartmentRepository;
 import com.wtmsbackend.repositories.OtpRepository;
 import com.wtmsbackend.repositories.UserRepository;
-import com.wtmsbackend.security.JwtDecodedResponse;
 import com.wtmsbackend.security.JwtService;
 import com.wtmsbackend.services.AuthService;
 import com.wtmsbackend.services.EmailService;
+
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,8 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImp.class);
+
 
     public UserResponse register(UserRequest userRequest) {
 
@@ -53,8 +58,8 @@ public class AuthServiceImp implements AuthService {
                 .lastName(userRequest.getLastName())
                 .email(userRequest.getEmail())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
-                .phoneNumber(userRequest.getPhoneNumber())
-                .address(userRequest.getAddress())
+                .phoneNumber(Optional.ofNullable(userRequest.getPhoneNumber()).orElse(""))
+                .address(Optional.ofNullable(userRequest.getAddress()).orElse(""))
                 .role(Role.EMPLOYEE)
                 .status(true)
                 .department(department)
@@ -67,6 +72,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+
+        logger.info("Request data {}", Object.class.cast(request));
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -80,22 +88,18 @@ public class AuthServiceImp implements AuthService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
-        var decoded = JwtDecodedResponse.builder()
-                .header(jwtService.decodeHeader(jwtToken))
-                .payload(jwtService.decodePayload(jwtToken))
-                .signature(jwtService.extractSignature(jwtToken))
-                .build();
-
         return LoginResponse.builder()
                 .user(mapToUserResponse(user))
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
-                .decodedToken(decoded)
                 .build();
     }
 
     @Override
     public void resendCode(String email) {
+
+        logger.info("Request data {}", String.format("Email: %s", email));
+
         // 1. Find the user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email"));
@@ -121,6 +125,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public void verifyOtpCode(String email, String otpCode) {
+
+        logger.info("Request data {}", String.format("Email: %s, OTP Code: %s", email, otpCode));
+
         // 1. Find user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -146,6 +153,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public void forgetPassword(String email) {
+
+        logger.info("Request data {}", String.format("Email: %s", email));
+
         // 1. Find user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -167,6 +177,9 @@ public class AuthServiceImp implements AuthService {
 
     // Helper method
     private UserResponse mapToUserResponse(User user) {
+
+        logger.info("Response  :", Object.class.cast(user));
+
         return UserResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
@@ -177,6 +190,8 @@ public class AuthServiceImp implements AuthService {
                 .status(user.getStatus())
                 .departmentId(user.getDepartment().getId())
                 .departmentName(user.getDepartment().getName())
+                .role(user.getRole().name())
                 .build();
     }
+
 }

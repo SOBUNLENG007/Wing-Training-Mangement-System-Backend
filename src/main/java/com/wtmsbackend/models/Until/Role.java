@@ -1,5 +1,4 @@
-package com.wtmsbackend.models.role;
-
+package com.wtmsbackend.models.Until;
 public enum Role {
     ADMIN,
     TRAINER,

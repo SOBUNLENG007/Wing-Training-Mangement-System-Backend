@@ -1,7 +1,5 @@
 package com.wtmsbackend.config;
 
-import com.wtmsbackend.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +12,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.wtmsbackend.security.JwtAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +37,7 @@ public class SecurityConfig {
                         // 2. Allow all Auth endpoints (Login, Register, OTP)
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // 3. Allow Swagger
+                        .requestMatchers("/api/v1/departments").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         // 4. Everything else requires a valid token
                         .anyRequest().authenticated()

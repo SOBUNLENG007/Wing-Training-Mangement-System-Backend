@@ -1,6 +1,6 @@
+
 package com.wtmsbackend.dto.response;
 
-import com.wtmsbackend.security.JwtDecodedResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +14,5 @@ public class LoginResponse {
     private UserResponse user;
     private String accessToken;
     private String refreshToken;
-    private JwtDecodedResponse decodedToken;
+    // private JwtDecodedResponse decodedToken;
 }

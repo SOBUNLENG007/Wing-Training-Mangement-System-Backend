@@ -10,7 +10,9 @@ import com.wtmsbackend.repositories.SessionRepository;
 import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.services.AttendanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +25,21 @@ public class AttendanceServiceImp implements AttendanceService {
     private final SessionRepository sessionRepository;
 
     @Override
-    public Page<AttendanceResponse> getAllAttendance(int page, int size) {
-        return attendanceRepository.findAll(PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<AttendanceResponse> getAllAttendance(int page, int size) {
+        List<AttendanceResponse> attendance = attendanceRepository.findAll(PageRequest.of(page, size)).map(this::mapToResponse).getContent();
+        return attendance;
     }
 
     @Override
-    public Page<AttendanceResponse> getAttendanceBySession(Integer sessionId, int page, int size) {
-        return attendanceRepository.findBySessionId(sessionId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<AttendanceResponse> getAttendanceBySession(Integer sessionId, int page, int size) {
+        List<AttendanceResponse> attendance = attendanceRepository.findBySessionId(sessionId, PageRequest.of(page, size)).map(this::mapToResponse).getContent();
+        return attendance;
     }
 
     @Override
-    public Page<AttendanceResponse> getAttendanceByUser(Integer userId, int page, int size) {
-        return attendanceRepository.findByUserId(userId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<AttendanceResponse> getAttendanceByUser(Integer userId, int page, int size) {
+        List<AttendanceResponse> attendance = attendanceRepository.findByUserId(userId, PageRequest.of(page, size)).map(this::mapToResponse).getContent();
+        return attendance;
     }
 
     @Override

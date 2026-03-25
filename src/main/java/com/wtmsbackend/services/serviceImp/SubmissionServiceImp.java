@@ -40,23 +40,17 @@ public class SubmissionServiceImp implements SubmissionService {
 
     @Override
     public SubmissionResponse getSubmissionById(Integer id) {
-        Submission submission = submissionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + id));
+        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new RuntimeException("Submission not found with ID: " + id));
         return mapToResponse(submission);
     }
 
     // 1. Employee Submits Homework
     @Override
     public SubmissionResponse createSubmission(SubmissionRequest request) {
-        Assignment assignment = assignmentRepository.findById(request.getAssignmentId())
-                .orElseThrow(() -> new RuntimeException("Assignment not found"));
-        User employee = userRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        Assignment assignment = assignmentRepository.findById(request.getAssignmentId()).orElseThrow(() -> new RuntimeException("Assignment not found"));
+        User employee = userRepository.findById(request.getEmployeeId()).orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        Submission submission = Submission.builder()
-                .assignment(assignment)
-                .employee(employee)
-                .fileUrl(request.getFileUrl())
+        Submission submission = Submission.builder().assignment(assignment).employee(employee).fileUrl(request.getFileUrl())
                 // Score and feedback stay null until the trainer grades it!
                 .build();
 
@@ -66,8 +60,7 @@ public class SubmissionServiceImp implements SubmissionService {
     // 2. Employee changes their file before grading
     @Override
     public SubmissionResponse updateSubmissionFile(Integer id, SubmissionRequest request) {
-        Submission submission = submissionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Submission not found"));
+        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new RuntimeException("Submission not found"));
 
         submission.setFileUrl(request.getFileUrl());
         return mapToResponse(submissionRepository.save(submission));
@@ -76,8 +69,7 @@ public class SubmissionServiceImp implements SubmissionService {
     // 3. Trainer grades the homework
     @Override
     public SubmissionResponse gradeSubmission(Integer id, GradeRequest request) {
-        Submission submission = submissionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Submission not found"));
+        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new RuntimeException("Submission not found"));
 
         // Prevent grading higher than the max score
         if (request.getScore() > submission.getAssignment().getTotalScore()) {
@@ -92,23 +84,11 @@ public class SubmissionServiceImp implements SubmissionService {
 
     @Override
     public void deleteSubmission(Integer id) {
-        Submission submission = submissionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Submission not found"));
+        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new RuntimeException("Submission not found"));
         submissionRepository.delete(submission);
     }
 
     private SubmissionResponse mapToResponse(Submission submission) {
-        return SubmissionResponse.builder()
-                .id(submission.getId())
-                .assignmentId(submission.getAssignment().getId())
-                .assignmentTitle(submission.getAssignment().getTitle())
-                .employeeId(submission.getEmployee().getId())
-                .employeeName(submission.getEmployee().getFirstName() + " " + submission.getEmployee().getLastName())
-                .fileUrl(submission.getFileUrl())
-                .score(submission.getScore())
-                .feedback(submission.getFeedback())
-                .createdAt(submission.getCreatedAt())
-                .updatedAt(submission.getUpdatedAt())
-                .build();
+        return SubmissionResponse.builder().id(submission.getId()).assignmentId(submission.getAssignment().getId()).assignmentTitle(submission.getAssignment().getTitle()).employeeId(submission.getEmployee().getId()).employeeName(submission.getEmployee().getFirstName() + " " + submission.getEmployee().getLastName()).fileUrl(submission.getFileUrl()).score(submission.getScore()).feedback(submission.getFeedback()).createdAt(submission.getCreatedAt()).updatedAt(submission.getUpdatedAt()).build();
     }
 }

@@ -10,7 +10,10 @@ import com.wtmsbackend.repositories.SessionRepository;
 import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.services.SessionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
+
+import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +24,27 @@ public class SessionServiceImp implements SessionService {
     private final SessionRepository sessionRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
+    private final Logger logger;
 
     @Override
-    public Page<SessionResponse> getAllSessions(int page, int size) {
+    public List<SessionResponse> getAllSessions(int page, int size) {
+
+        logger.info("Request data {}", String.format("Page: %d, Size: %d", page, size));
+
         PageRequest pageRequest = PageRequest.of(page, size);
-        return sessionRepository.findAll(pageRequest).map(this::mapToResponse);
+
+        List<SessionResponse> sessions = sessionRepository.findAll(pageRequest)
+                .map(this::mapToResponse)
+                .getContent();
+
+        return sessions;
     }
 
     @Override
     public SessionResponse getSessionById(Integer id) {
+
+        logger.info("Request data {}", String.format("Session ID: %d", id));
+
         Session session = sessionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Session not found with ID: " + id));
         return mapToResponse(session);
@@ -37,6 +52,9 @@ public class SessionServiceImp implements SessionService {
 
     @Override
     public SessionResponse createSession(SessionRequest request) {
+
+        logger.info("Request data {}", String.format("Session: %s", request));
+
         // Verify Department exists
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Department not found with ID: " + request.getDepartmentId()));
@@ -61,6 +79,9 @@ public class SessionServiceImp implements SessionService {
 
     @Override
     public SessionResponse updateSession(Integer id, SessionRequest request) {
+
+        logger.info("Request data {}", String.format("Session ID: %d, Session: %s", id, request));
+
         Session session = sessionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Session not found with ID: " + id));
 
@@ -89,6 +110,9 @@ public class SessionServiceImp implements SessionService {
 
     @Override
     public void deleteSession(Integer id) {
+
+        logger.info("Request data {}", String.format("Session ID: %d", id));
+
         Session session = sessionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Session not found with ID: " + id));
 
@@ -99,6 +123,7 @@ public class SessionServiceImp implements SessionService {
 
     // Helper Mapper
     private SessionResponse mapToResponse(Session session) {
+
         return SessionResponse.builder()
                 .id(session.getId())
                 .title(session.getTitle())
@@ -114,4 +139,5 @@ public class SessionServiceImp implements SessionService {
                         (session.getInstructor().getFirstName() + " " + session.getInstructor().getLastName()) : null)
                 .build();
     }
+
 }

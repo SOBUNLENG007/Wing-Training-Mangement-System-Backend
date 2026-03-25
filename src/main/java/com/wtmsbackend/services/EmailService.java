@@ -1,4 +1,5 @@
 package com.wtmsbackend.services;
+
 import jakarta.mail.MessagingException;
 
 public interface EmailService {

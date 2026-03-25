@@ -5,15 +5,20 @@ import com.wtmsbackend.dto.request.*;
 import com.wtmsbackend.dto.response.LoginResponse;
 import com.wtmsbackend.dto.response.UserResponse;
 import com.wtmsbackend.services.AuthService;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -85,6 +90,5 @@ public class AuthController {
                 .build();
         return ResponseEntity.ok(response);
     }
-
 
 }
