@@ -27,7 +27,7 @@ public class Session {
     @Column(nullable = false, length = 255)
     private String description;
 
-    @Column(name = "num_session", nullable = false)
+    @Column(name = "num_session", nullable = true)
     private Integer numSession;
 
     @Column(name = "start_date", nullable = false)

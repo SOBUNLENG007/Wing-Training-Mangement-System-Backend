@@ -30,11 +30,9 @@ public class Submission {
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
 
-    // The link to their uploaded document/PDF
     @Column(name = "file_url", nullable = false, length = 500)
     private String fileUrl;
 
-    // The grade given by the trainer (nullable because it's empty until graded)
     @Column(name = "score")
     private Integer score;
 

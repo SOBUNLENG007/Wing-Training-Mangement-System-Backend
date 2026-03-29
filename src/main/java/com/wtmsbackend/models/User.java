@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,6 +62,9 @@ public class User implements UserDetails {
     @Column(nullable = true)
     private Gender gender;
 
+//    @Column(nullable = true)
+//    private String imageUrl;
+
     @Column(name = "date_of_birth", nullable = true)
     private LocalDate dateOfBirth;
 
@@ -68,16 +72,12 @@ public class User implements UserDetails {
     @JoinColumn(name = "department_id")
     private Department department;
 
-    // Add this to your User entity to map the "user_session" table
     @ManyToMany(mappedBy = "students")
     private List<Session> enrolledSessions;
 
-    // ✅ KEY FIX — return authority WITHOUT "ROLE_" prefix
-    // This matches @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
-        // returns "ADMIN" → matches hasAuthority('ADMIN') ✅
     }
 
     @Override
