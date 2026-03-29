@@ -32,20 +32,11 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Allow preflight CORS requests
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 2. Allow all Auth endpoints (Login, Register, OTP)
-                        .requestMatchers("/api/v1/departments").permitAll()
-                        // 3. Allow Swagger
-                        .requestMatchers("/api/v1/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        // 4. Everything else requires a valid token
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // Allow all requests for testing
                 )
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                // 5. Use your manual JWT filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
