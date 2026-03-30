@@ -128,8 +128,12 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void userResetPassword(String newPassword, String oldPassword, String newPassword1) {
-
+    public void userResetPassword(User user, String oldPassword, String newPassword) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     private UserResponse mapToUserResponse(User user) {
@@ -149,5 +153,11 @@ public class UserServiceImp implements UserService {
         user.setRole(role);
 
         return mapToUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public User getUserEntityById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
 }

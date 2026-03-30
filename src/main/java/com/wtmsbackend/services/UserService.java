@@ -4,6 +4,7 @@ import com.wtmsbackend.dto.request.UserRequest;
 import com.wtmsbackend.dto.request.UserUpdateRequest;
 import com.wtmsbackend.dto.response.UserResponse;
 import com.wtmsbackend.models.Until.Role;
+import com.wtmsbackend.models.User;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -28,8 +29,8 @@ public interface UserService {
     // Add this new signature
     List<UserResponse> getUsersByDepartment(Integer departmentId, int page, int size);
 
-    void userResetPassword(String newPassword, String oldPassword, @NotBlank(message = "New password is required") @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters"
-    ) String newPassword1);
+    void userResetPassword(User user, String oldPassword, String newPassword);
+
+    // Add this method to fetch the User entity directly
+    User getUserEntityById(Integer id);
 }
