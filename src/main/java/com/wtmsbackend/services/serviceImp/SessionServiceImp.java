@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,17 +26,10 @@ public class SessionServiceImp implements SessionService {
     private final Logger logger;
 
     @Override
-    public List<SessionResponse> getAllSessions(int page, int size) {
-
-        logger.info("Request data {}", String.format("Page: %d, Size: %d", page, size));
-
-        PageRequest pageRequest = PageRequest.of(page, size);
-
-        List<SessionResponse> sessions = sessionRepository.findAll(pageRequest)
-                .map(this::mapToResponse)
-                .getContent();
-
-        return sessions;
+    public List<SessionResponse> getAllSessions() {
+        logger.info("Request all sessions");
+        List<Session> sessionEntities = sessionRepository.findAll();
+        return sessionEntities.stream().map(this::mapToResponse).toList();
     }
 
     @Override

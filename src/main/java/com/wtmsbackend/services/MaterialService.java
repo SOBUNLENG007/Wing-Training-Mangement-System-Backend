@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface MaterialService {
     List<MaterialResponse> getAllMaterials(int page, int size);
-
+    List<MaterialResponse> getAllMaterials();
     List<MaterialResponse> getMaterialsBySession(Integer sessionId, int page, int size);
-
+    List<MaterialResponse> getMaterialsBySession(Integer sessionId);
     MaterialResponse getMaterialById(Integer id);
 
     MaterialResponse createMaterial(MaterialRequest request);

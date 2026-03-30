@@ -151,18 +151,14 @@ public class SessionController {
 
     private final SessionService sessionService;
 
-    @Operation(summary = "Get all sessions (Paginated)", description = "Retrieves a paginated list of all training sessions.")
+    @Operation(summary = "Get all sessions", description = "Retrieves all training sessions.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SessionResponse>>> getAllSessions(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        List<SessionResponse> sessionPage = sessionService.getAllSessions(page, size);
-
+    public ResponseEntity<ApiResponse<List<SessionResponse>>> getAllSessions() {
+        List<SessionResponse> sessions = sessionService.getAllSessions();
         ApiResponse<List<SessionResponse>> response = ApiResponse.<List<SessionResponse>>builder()
                 .message("Sessions fetched successfully!")
                 .success(true)
-                .payload(sessionPage)
+                .payload(sessions)
                 .timestamp(LocalDateTime.now())
                 .build();
 

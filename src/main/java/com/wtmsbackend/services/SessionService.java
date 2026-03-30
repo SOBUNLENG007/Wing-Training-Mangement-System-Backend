@@ -6,7 +6,7 @@ import com.wtmsbackend.dto.response.SessionResponse;
 import java.util.List;
 
 public interface SessionService {
-    List<SessionResponse> getAllSessions(int page, int size);
+    List<SessionResponse> getAllSessions();
 
     SessionResponse getSessionById(Integer id);
 

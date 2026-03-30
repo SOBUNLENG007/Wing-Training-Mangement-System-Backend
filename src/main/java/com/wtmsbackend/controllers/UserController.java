@@ -233,7 +233,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wtmsbackend.dto.ApiResponse;
@@ -265,19 +264,14 @@ public class UserController {
     )
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        List<UserResponse> users = userService.getAllUsers(page, size);
-
+    public ResponseEntity<?> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
         ApiResponse<List<UserResponse>> response = ApiResponse.<List<UserResponse>>builder()
                 .message("Users fetched successfully")
                 .success(true)
                 .payload(users)
                 .timestamp(LocalDateTime.now())
                 .build();
-
         return ResponseEntity.ok(response);
     }
 
@@ -429,14 +423,8 @@ public class UserController {
             description = "Retrieves a list of users that belong to a specific department."
     )
     @GetMapping("/department/{departmentId}")
-    public ResponseEntity<?> getUsersByDepartment(
-            @PathVariable Integer departmentId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        // Fetch the page from the service, but extract ONLY the list of UserResponse objects
-        List<UserResponse> users = userService.getUsersByDepartment(departmentId, page, size);
-
+    public ResponseEntity<?> getUsersByDepartment(@PathVariable Integer departmentId) {
+        List<UserResponse> users = userService.getUsersByDepartment(departmentId);
         ApiResponse<List<UserResponse>> response = ApiResponse.<List<UserResponse>>builder()
                 .message("Users fetched successfully by department")
                 .success(true)
@@ -458,6 +446,22 @@ public class UserController {
                 .message("User updated successfully")
                 .success(true)
                 .payload(user)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get users by Role",
+            description = "Retrieves a list of users that have a specific role."
+    )
+    @GetMapping("/role/{role}")
+    public ResponseEntity<?> getUsersByRole(@PathVariable Role role) {
+        List<UserResponse> users = userService.getUsersByRole(role);
+        ApiResponse<List<UserResponse>> response = ApiResponse.<List<UserResponse>>builder()
+                .message("Users fetched successfully by role")
+                .success(true)
+                .payload(users)
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.ok(response);

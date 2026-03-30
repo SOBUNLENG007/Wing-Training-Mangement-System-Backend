@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 
 public interface UserService {
-    List<UserResponse> getAllUsers(int page, int size);
+    List<UserResponse> getAllUsers();
 
     UserResponse getUserById(Integer id);
 
@@ -27,10 +27,15 @@ public interface UserService {
     void deleteUser(Integer id);
 
     // Add this new signature
-    List<UserResponse> getUsersByDepartment(Integer departmentId, int page, int size);
+    List<UserResponse> getUsersByDepartment(Integer departmentId);
 
     void userResetPassword(User user, String oldPassword, String newPassword);
 
     // Add this method to fetch the User entity directly
     User getUserEntityById(Integer id);
+
+    /**
+     * Get all users by role
+     */
+    List<UserResponse> getUsersByRole(Role role);
 }

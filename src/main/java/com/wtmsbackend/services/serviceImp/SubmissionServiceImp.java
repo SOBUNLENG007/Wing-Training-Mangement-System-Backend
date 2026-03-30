@@ -11,9 +11,9 @@ import com.wtmsbackend.repositories.SubmissionRepository;
 import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.services.SubmissionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,18 +24,18 @@ public class SubmissionServiceImp implements SubmissionService {
     private final UserRepository userRepository;
 
     @Override
-    public Page<SubmissionResponse> getAllSubmissions(int page, int size) {
-        return submissionRepository.findAll(PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<SubmissionResponse> getAllSubmissions() {
+        return submissionRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
     @Override
-    public Page<SubmissionResponse> getSubmissionsByAssignment(Integer assignmentId, int page, int size) {
-        return submissionRepository.findByAssignmentId(assignmentId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<SubmissionResponse> getSubmissionsByAssignment(Integer assignmentId) {
+        return submissionRepository.findAll().stream().filter(s -> s.getAssignment().getId().equals(assignmentId)).map(this::mapToResponse).toList();
     }
 
     @Override
-    public Page<SubmissionResponse> getSubmissionsByEmployee(Integer employeeId, int page, int size) {
-        return submissionRepository.findByEmployeeId(employeeId, PageRequest.of(page, size)).map(this::mapToResponse);
+    public List<SubmissionResponse> getSubmissionsByEmployee(Integer employeeId) {
+        return submissionRepository.findAll().stream().filter(s -> s.getEmployee().getId().equals(employeeId)).map(this::mapToResponse).toList();
     }
 
     @Override

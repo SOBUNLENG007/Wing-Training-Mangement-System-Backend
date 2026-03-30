@@ -6,12 +6,14 @@ import com.wtmsbackend.dto.response.SubmissionResponse;
 
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface SubmissionService {
-    Page<SubmissionResponse> getAllSubmissions(int page, int size);
+    List<SubmissionResponse> getAllSubmissions();
 
-    Page<SubmissionResponse> getSubmissionsByAssignment(Integer assignmentId, int page, int size);
+    List<SubmissionResponse> getSubmissionsByAssignment(Integer assignmentId);
 
-    Page<SubmissionResponse> getSubmissionsByEmployee(Integer employeeId, int page, int size);
+    List<SubmissionResponse> getSubmissionsByEmployee(Integer employeeId);
 
     SubmissionResponse getSubmissionById(Integer id);
 

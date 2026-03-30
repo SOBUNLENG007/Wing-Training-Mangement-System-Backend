@@ -35,23 +35,29 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-    @Operation(summary = "Get all materials", description = "Retrieves a paginated list of all training materials in the system.")
+    @Operation(summary = "Get all materials", description = "Retrieves a list of all training materials in the system.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getAllMaterials(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        List<MaterialResponse> materialPage = materialService.getAllMaterials(page, size);
-
-        ApiResponse<List<MaterialResponse>> response = ApiResponse.<List<MaterialResponse>>builder().message("Materials fetched successfully!").success(true).payload(materialPage).timestamp(LocalDateTime.now()).build();
-
+    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getAllMaterials() {
+        List<MaterialResponse> materials = materialService.getAllMaterials();
+        ApiResponse<List<MaterialResponse>> response = ApiResponse.<List<MaterialResponse>>builder()
+                .message("Materials fetched successfully!")
+                .success(true)
+                .payload(materials)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get materials by Session ID", description = "Retrieves a paginated list of materials assigned to a specific training session.")
+    @Operation(summary = "Get materials by Session ID", description = "Retrieves a list of materials assigned to a specific training session.")
     @GetMapping("/session/{sessionId}")
-    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getMaterialsBySession(@PathVariable Integer sessionId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        List<MaterialResponse> materialPage = materialService.getMaterialsBySession(sessionId, page, size);
-
-        ApiResponse<List<MaterialResponse>> response = ApiResponse.<List<MaterialResponse>>builder().message("Session materials fetched successfully!").success(true).payload(materialPage).timestamp(LocalDateTime.now()).build();
-
+    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getMaterialsBySession(@PathVariable Integer sessionId) {
+        List<MaterialResponse> materials = materialService.getMaterialsBySession(sessionId);
+        ApiResponse<List<MaterialResponse>> response = ApiResponse.<List<MaterialResponse>>builder()
+                .message("Session materials fetched successfully!")
+                .success(true)
+                .payload(materials)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.ok(response);
     }
 

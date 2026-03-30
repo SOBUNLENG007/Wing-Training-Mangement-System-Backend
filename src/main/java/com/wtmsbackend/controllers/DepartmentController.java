@@ -239,4 +239,36 @@ public class DepartmentController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+            summary = "Get department by user email",
+            description = "Retrieves the department for a user by their email address."
+    )
+    @GetMapping("/by-email/{email}")
+    public ResponseEntity<ApiResponse<DepartmentResponse>> getDepartmentByUserEmail(@PathVariable String email) {
+        DepartmentResponse department = departmentService.getDepartmentByUserEmail(email);
+        ApiResponse<DepartmentResponse> response = ApiResponse.<DepartmentResponse>builder()
+                .message("Department fetched successfully by user email!")
+                .success(true)
+                .payload(department)
+                .timestamp(java.time.LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Get department by user ID",
+            description = "Retrieves the department for a user by their user ID."
+    )
+    @GetMapping("/by-user-id/{userId}")
+    public ResponseEntity<ApiResponse<DepartmentResponse>> getDepartmentByUserId(@PathVariable Integer userId) {
+        DepartmentResponse department = departmentService.getDepartmentByUserId(userId);
+        ApiResponse<DepartmentResponse> response = ApiResponse.<DepartmentResponse>builder()
+                .message("Department fetched successfully by user ID!")
+                .success(true)
+                .payload(department)
+                .timestamp(java.time.LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

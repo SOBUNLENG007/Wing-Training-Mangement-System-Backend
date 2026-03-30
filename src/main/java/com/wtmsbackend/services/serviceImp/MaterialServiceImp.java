@@ -84,6 +84,19 @@ public class MaterialServiceImp implements MaterialService {
         materialRepository.delete(material);
     }
 
+    @Override
+    public List<MaterialResponse> getAllMaterials() {
+        return materialRepository.findAll().stream().map(this::mapToResponse).toList();
+    }
+
+    @Override
+    public List<MaterialResponse> getMaterialsBySession(Integer sessionId) {
+        return materialRepository.findAll().stream()
+            .filter(m -> m.getSession() != null && m.getSession().getId().equals(sessionId))
+            .map(this::mapToResponse)
+            .toList();
+    }
+
     private MaterialResponse mapToResponse(Material material) {
         return MaterialResponse.builder().id(material.getId()).title(material.getTitle()).fileUrl(material.getFileUrl()).sessionId(material.getSession() != null ? material.getSession().getId() : null).sessionTitle(material.getSession() != null ? material.getSession().getTitle() : null).trainerId(material.getTrainer() != null ? material.getTrainer().getId() : null).trainerName(material.getTrainer() != null ? (material.getTrainer().getFirstName() + " " + material.getTrainer().getLastName()) : null).createdAt(material.getCreatedAt()).build();
     }

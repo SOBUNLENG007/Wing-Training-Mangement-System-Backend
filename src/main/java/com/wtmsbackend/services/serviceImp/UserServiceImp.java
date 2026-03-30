@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,17 +30,11 @@ public class UserServiceImp implements UserService {
     private final Logger logger;
 
     @Override
-    public List<UserResponse> getAllUsers(int page, int size) {
+    public List<UserResponse> getAllUsers() {
 
-        // Logging the request parameters
-        logger.info("Request data {}", String.format("Page: %d, Size: %d", page, size));
-
-        // Mapper to convert Entity to DTO
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<User> usersPage = userRepository.findAll(pageRequest);
-        List<UserResponse> users = usersPage.getContent().stream().map(user -> modelMapper.map(user, UserResponse.class)).toList();
-        // Map the Page of Entities to a Page of DTOs
-        return users;
+        logger.info("Request all users");
+        List<User> users = userRepository.findAll();
+        return users.stream().map(user -> modelMapper.map(user, UserResponse.class)).toList();
     }
 
 
@@ -67,7 +59,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponse createUser(UserRequest request) {
 
-        logger.info("Request data {}", Object.class.cast(request));
+        logger.info("Request data {}", request);
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists!");
@@ -86,7 +78,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponse updateUser(Integer id, UserUpdateRequest request) {
 
-        logger.info("Request data {}", String.format("User ID: %d, Update Data: %s", id, Object.class.cast(request)));
+        logger.info("Request data {}", String.format("User ID: %d, Update Data: %s", id, request));
 
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
@@ -113,18 +105,11 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsersByDepartment(Integer departmentId, int page, int size) {
-
-        logger.info("Request data {}", String.format("Department ID: %d, Page: %d, Size: %d", departmentId, page, size));
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<User> usersPage = userRepository.findByDepartmentId(departmentId, pageRequest);
-
-        for (User user : usersPage) {
-            modelMapper.map(user, UserResponse.class);
-        }
-        List<UserResponse> users = usersPage.getContent().stream().map(user -> modelMapper.map(user, UserResponse.class)).toList();
-
-        return users;
+    public List<UserResponse> getUsersByDepartment(Integer departmentId) {
+        logger.info("Request users by department {}", departmentId);
+        // Use a non-paginated repository method, or fetch all and filter if needed
+        List<User> users = userRepository.findAll().stream().filter(u -> u.getDepartment() != null && u.getDepartment().getId().equals(departmentId)).toList();
+        return users.stream().map(user -> modelMapper.map(user, UserResponse.class)).toList();
     }
 
     @Override
@@ -138,7 +123,7 @@ public class UserServiceImp implements UserService {
 
     private UserResponse mapToUserResponse(User user) {
 
-        logger.info("Response  :{}", Object.class.cast(user));
+        logger.info("Response  :{}", user);
 
         return UserResponse.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).email(user.getEmail()).phoneNumber(user.getPhoneNumber()).address(user.getAddress()).status(user.getStatus()).departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null).departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null).role(user.getRole() != null ? user.getRole().name() : null).build();
     }
@@ -159,5 +144,14 @@ public class UserServiceImp implements UserService {
     public User getUserEntityById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+    }
+
+    @Override
+    public List<UserResponse> getUsersByRole(Role role) {
+        logger.info("Request users by role {}", role);
+        List<User> users = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null && u.getRole().equals(role))
+                .toList();
+        return users.stream().map(user -> modelMapper.map(user, UserResponse.class)).toList();
     }
 }

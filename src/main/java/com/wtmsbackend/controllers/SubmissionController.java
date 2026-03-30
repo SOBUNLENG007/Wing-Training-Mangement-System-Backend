@@ -3,7 +3,6 @@ package com.wtmsbackend.controllers;
 import com.wtmsbackend.dto.ApiResponse;
 import com.wtmsbackend.dto.request.GradeRequest;
 import com.wtmsbackend.dto.request.SubmissionRequest;
-import com.wtmsbackend.dto.response.PagedResponse;
 import com.wtmsbackend.dto.response.SubmissionResponse;
 import com.wtmsbackend.services.SubmissionService;
 
@@ -15,12 +14,12 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/submissions")
@@ -31,35 +30,44 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @Operation(summary = "Get all submissions", description = "Retrieves a paginated list of all homework submissions.")
+    @Operation(summary = "Get all submissions", description = "Retrieves a list of all homework submissions.")
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getAllSubmissions(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<SubmissionResponse> submissionPage = submissionService.getAllSubmissions(page, size);
-
-        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder().message("Submissions fetched successfully!").success(true).payload(buildPagedResponse(submissionPage)).timestamp(LocalDateTime.now()).build();
-
+    public ResponseEntity<ApiResponse<List<SubmissionResponse>>> getAllSubmissions() {
+        List<SubmissionResponse> submissions = submissionService.getAllSubmissions();
+        ApiResponse<List<SubmissionResponse>> response = ApiResponse.<List<SubmissionResponse>>builder()
+                .message("Submissions fetched successfully!")
+                .success(true)
+                .payload(submissions)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get submissions by Assignment", description = "Retrieves all submissions turned in for a specific assignment.")
     @GetMapping("/assignment/{assignmentId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TRAINER')")
-    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getSubmissionsByAssignment(@PathVariable Integer assignmentId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<SubmissionResponse> submissionPage = submissionService.getSubmissionsByAssignment(assignmentId, page, size);
-
-        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder().message("Assignment submissions fetched successfully!").success(true).payload(buildPagedResponse(submissionPage)).timestamp(LocalDateTime.now()).build();
-
+    public ResponseEntity<ApiResponse<List<SubmissionResponse>>> getSubmissionsByAssignment(@PathVariable Integer assignmentId) {
+        List<SubmissionResponse> submissions = submissionService.getSubmissionsByAssignment(assignmentId);
+        ApiResponse<List<SubmissionResponse>> response = ApiResponse.<List<SubmissionResponse>>builder()
+                .message("Assignment submissions fetched successfully!")
+                .success(true)
+                .payload(submissions)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get submissions by Employee", description = "Retrieves all submissions made by a specific employee.")
     @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<ApiResponse<PagedResponse<SubmissionResponse>>> getSubmissionsByEmployee(@PathVariable Integer employeeId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<SubmissionResponse> submissionPage = submissionService.getSubmissionsByEmployee(employeeId, page, size);
-
-        ApiResponse<PagedResponse<SubmissionResponse>> response = ApiResponse.<PagedResponse<SubmissionResponse>>builder().message("Employee submissions fetched successfully!").success(true).payload(buildPagedResponse(submissionPage)).timestamp(LocalDateTime.now()).build();
-
+    public ResponseEntity<ApiResponse<List<SubmissionResponse>>> getSubmissionsByEmployee(@PathVariable Integer employeeId) {
+        List<SubmissionResponse> submissions = submissionService.getSubmissionsByEmployee(employeeId);
+        ApiResponse<List<SubmissionResponse>> response = ApiResponse.<List<SubmissionResponse>>builder()
+                .message("Employee submissions fetched successfully!")
+                .success(true)
+                .payload(submissions)
+                .timestamp(LocalDateTime.now())
+                .build();
         return ResponseEntity.ok(response);
     }
 
@@ -113,9 +121,5 @@ public class SubmissionController {
         ApiResponse<Void> response = ApiResponse.<Void>builder().message("Submission deleted successfully!").success(true).payload(null).timestamp(LocalDateTime.now()).build();
 
         return ResponseEntity.ok(response);
-    }
-
-    private PagedResponse<SubmissionResponse> buildPagedResponse(Page<SubmissionResponse> page) {
-        return PagedResponse.<SubmissionResponse>builder().content(page.getContent()).pageNumber(page.getNumber()).pageSize(page.getSize()).totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).last(page.isLast()).build();
     }
 }

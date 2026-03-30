@@ -3,7 +3,9 @@ package com.wtmsbackend.services.serviceImp;
 import com.wtmsbackend.dto.request.DepartmentRequest;
 import com.wtmsbackend.dto.response.DepartmentResponse;
 import com.wtmsbackend.models.Department;
+import com.wtmsbackend.models.User;
 import com.wtmsbackend.repositories.DepartmentRepository;
+import com.wtmsbackend.repositories.UserRepository;
 import com.wtmsbackend.services.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class DepartmentServiceImp implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<DepartmentResponse> getAllDepartments() {
@@ -61,6 +64,28 @@ public class DepartmentServiceImp implements DepartmentService {
         // Soft delete
         department.setStatus(false);
         departmentRepository.save(department);
+    }
+
+    @Override
+    public DepartmentResponse getDepartmentByUserEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        Department department = user.getDepartment();
+        if (department == null) {
+            throw new RuntimeException("Department not found for user with email: " + email);
+        }
+        return mapToResponse(department);
+    }
+
+    @Override
+    public DepartmentResponse getDepartmentByUserId(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        Department department = user.getDepartment();
+        if (department == null) {
+            throw new RuntimeException("Department not found for user with ID: " + userId);
+        }
+        return mapToResponse(department);
     }
 
     private DepartmentResponse mapToResponse(Department department) {
