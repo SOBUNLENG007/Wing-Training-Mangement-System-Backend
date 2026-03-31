@@ -70,7 +70,19 @@ public class UserServiceImp implements UserService {
             department = departmentRepository.findById(request.getDepartmentId()).orElseThrow(() -> new RuntimeException("Department not found with ID: " + request.getDepartmentId()));
         }
 
-        User user = User.builder().firstName(request.getFirstName()).lastName(request.getLastName()).email(request.getEmail()).department(department).password(passwordEncoder.encode(request.getPassword())).phoneNumber(request.getPhoneNumber()).address(request.getAddress()).role(Role.EMPLOYEE).status(true).build();
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .department(department)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .role(Role.EMPLOYEE)
+                .status(true)
+                .gender(request.getGender() != null ? com.wtmsbackend.models.Until.Gender.valueOf(request.getGender().toUpperCase()) : null)
+                .dateOfBirth(request.getDateOfBirth())
+                .build();
 
         return mapToUserResponse(userRepository.save(user));
     }

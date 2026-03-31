@@ -50,8 +50,6 @@
 
 package com.wtmsbackend.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -73,7 +71,7 @@ public class UserRequest {
     private String lastName;
 
     @NotBlank(message = "Email is required")
-    @Size(max = 150, message = "Email cannot exceed 150 characters") // Matches your DB VARCHAR(150)
+    @Size(max = 150, message = "Email cannot exceed 150 characters")
     @Email(regexp = "^[A-Za-z0-9._%+-]+@gmail\\.com$", message = "Format: example@gmail.com")
     private String email;
 
@@ -84,18 +82,9 @@ public class UserRequest {
     )
     private String password;
 
-    // --- Added WTMS Specific Fields ---
-
-    //    @NotBlank(message = "Phone number is required")
-//    @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Invalid phone number format")
-    @JsonIgnore
     private String phoneNumber;
-
-    //    @NotBlank(message = "Address is required")
-//    @Size(max = 255, message = "Address cannot exceed 255 characters")
-    @JsonIgnore
     private String address;
-
-    //    @NotNull(message = "Department ID is required")
     private Integer departmentId;
+    private String gender;
+    private java.time.LocalDate dateOfBirth;
 }
